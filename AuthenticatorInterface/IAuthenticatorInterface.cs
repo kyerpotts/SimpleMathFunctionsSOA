@@ -20,6 +20,6 @@ namespace AuthenticatorInterface
         [OperationContract]
         string Validate(int token);
 
-
+        void clearSavedTokens(int timespan);
     }
 }
