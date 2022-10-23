@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Authenticator", "Authentica
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthenticatorInterface", "AuthenticatorInterface\AuthenticatorInterface.csproj", "{6F9B737C-6F22-4BE3-9598-28F9EAC42493}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServiceProvider", "ServiceProvider\ServiceProvider.csproj", "{138BB0E2-1DF6-437D-A69B-3A3ABBF9266C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{6F9B737C-6F22-4BE3-9598-28F9EAC42493}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6F9B737C-6F22-4BE3-9598-28F9EAC42493}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6F9B737C-6F22-4BE3-9598-28F9EAC42493}.Release|Any CPU.Build.0 = Release|Any CPU
+		{138BB0E2-1DF6-437D-A69B-3A3ABBF9266C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{138BB0E2-1DF6-437D-A69B-3A3ABBF9266C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{138BB0E2-1DF6-437D-A69B-3A3ABBF9266C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{138BB0E2-1DF6-437D-A69B-3A3ABBF9266C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

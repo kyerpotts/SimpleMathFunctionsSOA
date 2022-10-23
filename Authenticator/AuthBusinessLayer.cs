@@ -1,67 +1,181 @@
 ﻿using AuthenticatorInterface;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.ServiceModel;
+using System.ServiceModel.Syndication;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Authenticator
 {
+    [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false, InstanceContextMode = InstanceContextMode.Single)]
     internal class AuthBusinessLayer : IAuthenticatorInterface
     {
-        public async void clearSavedTokens(int timespan)
-        {
-            throw new NotImplementedException();
-        }
+        AuthDataLayer dataLayer;
+        Mutex mutexLock;
+        Mutex writeMutex;
+        private static object instanceMutex = new object();
+        int currentReaders = 0;
 
-        public int Login(string name, string password)
-        {
-            throw new FaultException<>():
-        }
+        // Creates a singleton to be used for Authentication. This ensures that a new business layer object is not created whenever the server receives a call
+        private static volatile AuthBusinessLayer instance = null;
 
-        public string Register(string name, string password)
+        public static AuthBusinessLayer Create(string credentialsFilePath, string valTokenPath)
         {
-            throw new NotImplementedException();
-        }
-
-        public string Validate(int token)
-        {
-            throw new NotImplementedException();
-        }
-        public int ValidateLogin(string username, string password)
-        {
-            int loginToken = 0;
-            // A dictionary is used to build the map of user credentials. This will allow the function to easily parse and match usernames and passwords
-            Dictionary<string, string> credentialsDictionary = new Dictionary<string, string>();
-
-            // A validation file must exist for validation to occur
-            if (File.Exists(credentialsFilePath))
+            lock (instanceMutex)
             {
-                using (StreamReader sr = File.OpenText(credentialsFilePath))
+                if (instance == null)
                 {
-                    string readString = String.Empty;
-                    while ((readString = sr.ReadLine()) != null)
-                    {
-                        string[] credTokens = readString.Split(':');
-                        credentialsDictionary.Add(credTokens[0], credTokens[1]);
-                    }
+                    instance = new AuthBusinessLayer(credentialsFilePath, valTokenPath);
+
+                    return instance;
+                }
+                else
+                {
+                    throw new InvalidOperationException("Instance has already been created. Please use RetrieveInstance function");
                 }
 
-                // If a match is found for login, the temporary validation token is saved to the file and the token is then returned to the caller
-                if (this.matchCredentials(username, password, credentialsDictionary))
+            }
+        }
+
+        public static AuthBusinessLayer RetrieveInstance()
+        {
+            lock (instanceMutex)
+            {
+                if (instance != null)
                 {
-                    loginToken = validationTokenNum++;
-                    writeValToken(loginToken);
+                    return instance;
+                }
+                else
+                {
+                    throw new InvalidOperationException("Instance has not been created. Please use Create function");
                 }
             }
-            else
+        }
+
+        // Standard constructor made private to prevent instantiation outside of the singleton
+        private AuthBusinessLayer(string credentialsFilePath, string valTokenPath)
+        {
+            dataLayer = new AuthDataLayer(credentialsFilePath, valTokenPath);
+
+            mutexLock = new Mutex();
+            writeMutex = new Mutex();
+        }
+
+        // Uses the given timespan in minutes to determine when the validation tokens file needs to be cleared
+        public async Task ClearSavedTokens(int timespanMinutes, CancellationToken cancellationToken)
+        {
+            while (true)
             {
-                throw new FileNotFoundException();
+                Task delayTask = Task.Delay(TimeSpan.FromMinutes(timespanMinutes), cancellationToken);
+                cancellationToken.ThrowIfCancellationRequested();
+                await delayTask;
+                Task clearTokensTask = Task.Run(() =>
+                {
+                    if (writeMutex.WaitOne())
+                    {
+                        try
+                        {
+                            dataLayer.clearAllValTokens();
+                        }
+                        finally
+                        {
+                            writeMutex.ReleaseMutex();
+                        }
+                    }
+                });
+                await clearTokensTask;
+            }
+        }
+
+        public int Login(string username, string password)
+        {
+            int loginToken = 0;
+            try
+            {
+                // A dictionary is used to build the map of user credentials. This will allow the function to easily parse and match usernames and passwords
+                Dictionary<string, string> credentialsDictionary = dataLayer.getCredDict();
+
+
+                // If a match is found for login, the temporary validation token is saved to the file and the token is then returned to the caller
+                if (matchCredentials(username, password, credentialsDictionary))
+                {
+                    writeMutex.WaitOne();
+                    loginToken = dataLayer.writeValToken();
+                    writeMutex.ReleaseMutex();
+                }
+            }
+            catch (FileNotFoundException fnfe)
+            {
+                AuthenticationException AuthEx = new AuthenticationException();
+                AuthEx.Details = fnfe.Message;
+                throw new FaultException<AuthenticationException>(AuthEx);
             }
 
             // Returns either a valid token (greater than 0) or an invalid token (0) depending on the outcome of the validation
             return loginToken;
+
+        }
+
+        public string Register(string name, string password)
+        {
+            try
+            {
+                writeMutex.WaitOne();
+                dataLayer.RegisterNewCredentials(name, password);
+                writeMutex.ReleaseMutex();
+                return "Successfully Registered";
+            }
+            catch (FileNotFoundException fnfe)
+            {
+                AuthenticationException AuthEx = new AuthenticationException();
+                AuthEx.Details = fnfe.Message;
+                throw new FaultException<AuthenticationException>(AuthEx);
+            }
+        }
+
+        public string Validate(int token)
+        {
+            try
+            {
+                // Tokenlist is shared amongst threads and therefor needs to be syncronized properly
+                // These threads are sync'd with a generic implementation of the readers/writers problem solution
+                mutexLock.WaitOne();
+                currentReaders++;
+                if (currentReaders == 1)
+                {
+                    writeMutex.WaitOne();
+                    mutexLock.ReleaseMutex();
+                }
+                List<int> tokenList = dataLayer.readValTokens();
+                mutexLock.WaitOne();
+                currentReaders--;
+                if (currentReaders == 0)
+                {
+                    writeMutex.ReleaseMutex();
+                    mutexLock.ReleaseMutex();
+                }
+
+                // Each item in the list is checked against the provided token to see if there's a match
+                foreach (int item in tokenList)
+                {
+                    if (token == item)
+                    {
+                        return "validated";
+                    }
+                }
+                return "not validated";
+
+            }
+            catch (FileNotFoundException fnfe)
+            {
+                AuthenticationException AuthEx = new AuthenticationException();
+                AuthEx.Details = fnfe.Message;
+                throw new FaultException<AuthenticationException>(AuthEx);
+            }
         }
 
         // The validation token needs to be written to the token file each time login is authenticated.
