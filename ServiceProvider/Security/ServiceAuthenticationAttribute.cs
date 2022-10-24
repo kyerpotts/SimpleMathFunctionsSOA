@@ -1,4 +1,5 @@
-﻿using AuthenticatorInterface;
+﻿using APIEndpoint;
+using AuthenticatorInterface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,14 +27,13 @@ namespace ServiceProvider.Security
             else
             {
                 string authInfo = actionContext.Request.Headers.Authorization.Parameter;
-                string decodedAuthInfo = Encoding.UTF8.GetString(Convert.FromBase64String(authInfo));
                 int token;
-                if (int.TryParse(decodedAuthInfo, out token))
+                if (int.TryParse(authInfo, out token))
                 {
                     try
                     {
                         ValidateUser valUser = new ValidateUser();
-                        if (valUser.ValidateUserByAuthServer(token).Equals("validated"))
+                        if (!(valUser.ValidateUserByAuthServer(token).Equals("validated")))
                         {
                             actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, Newtonsoft.Json.JsonConvert.SerializeObject(new { Status = "Denied", Reason = "Authentication Error" }));
                             //Thread.CurrentPrincipal = new GenericPrincipal(new GenericIdentity(token.ToString()), null);
@@ -41,7 +41,7 @@ namespace ServiceProvider.Security
                     }
                     catch (FaultException<AuthenticationException>)
                     {
-                        //actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, "Authentication failed");
+                        actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, Newtonsoft.Json.JsonConvert.SerializeObject(new { Status = "Denied", Reason = "Authentication Error" }));
                     }
                 }
                 else
