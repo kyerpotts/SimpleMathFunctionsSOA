@@ -23,6 +23,7 @@ namespace ServiceProvider.Controllers
         [Route("addthreenumbers/{firstnum}/{secondnum}/{thirdnum}")]
         [Route("addthreenumbers")]
         [HttpGet]
+        [ServiceAuthentication]
         public IHttpActionResult AddThreeNumbers(int firstnum, int secondnum, int thirdnum)
         {
             return Ok(firstnum + secondnum + thirdnum);
@@ -31,6 +32,7 @@ namespace ServiceProvider.Controllers
         [Route("multwonumbers/{firstnum}/{secondnum}")]
         [Route("multwonumbers")]
         [HttpGet]
+        [ServiceAuthentication]
         public IHttpActionResult MulTwoNumbers(int firstnum, int secondnum)
         {
             return Ok(firstnum * secondnum);
@@ -39,6 +41,7 @@ namespace ServiceProvider.Controllers
         [Route("multhreenumbers/{firstnum}/{secondnum}/{thirdnum}")]
         [Route("mullthreenumbers")]
         [HttpGet]
+        [ServiceAuthentication]
         public IHttpActionResult MulThreeNumbers(int firstnum, int secondnum, int thirdnum)
         {
             return Ok(firstnum * secondnum * thirdnum);
