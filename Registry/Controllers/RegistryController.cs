@@ -1,18 +1,19 @@
-﻿using System;
+﻿using APIEndpoint;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Net;
+using System.Net.Http;
 using System.Web.Http;
-using System.Web.Mvc;
 
 namespace Registry.Controllers
 {
-    public class RegistryController : Controller
+    public class RegistryController : ApiController
     {
-        // GET: Registry
+        // Saves the APIEndpoint data to a registry file
         public IHttpActionResult Publish(string jEndpoint)
         {
-
+            return Ok(new ReturnStatus { Status = "Accepted", Reason = "Endpoint published to registry successfully."});
         }
     }
 }

@@ -162,6 +162,7 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\RegistryBusinessLayer.cs" />
     <Compile Include="Models\RegistryDataLayer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Security\ServiceAuthenticationAttribute.cs" />
