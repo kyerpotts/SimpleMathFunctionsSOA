@@ -18,7 +18,7 @@ namespace Registry.Models
             if (File.Exists(filePath))
             {
                 // Read all of the endpoints from the file
-                List<EndpointObject> endpoints = ReadAllEndpoints(filePath);
+                List<EndpointObject> endpoints = ReadEndpoints(filePath);
                 // The new endpoint needs to be added to the list
                 endpoints.Add(JsonConvert.DeserializeObject<EndpointObject>(jEndpoint));
                 // Once the new endpoint has been added, the entire file is rewritten.
@@ -36,7 +36,7 @@ namespace Registry.Models
             }
         }
 
-        public static List<EndpointObject> ReadAllEndpoints(string filePath)
+        public static List<EndpointObject> ReadEndpoints(string filePath)
         {
             // The file must exist for information to be read. If it doesn't exist, some error has occured
             if (File.Exists(filePath))
@@ -51,6 +51,16 @@ namespace Registry.Models
             {
                 throw new FileNotFoundException();
             }
+        }
+
+        public static void DeleteAllEndpoints(string filePath)
+        {
+
+        }
+
+        public static void WriteAllEndpoints(string filePath, List<EndpointObject> endpoints)
+        {
+
         }
     }
 }

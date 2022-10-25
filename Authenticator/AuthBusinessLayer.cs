@@ -15,15 +15,18 @@ namespace Authenticator
     internal class AuthBusinessLayer : IAuthenticatorInterface
     {
         AuthDataLayer dataLayer;
+        // Mutual exclusion objects to provide thread synchronization for readers and writers
         Mutex mutexLock;
         Mutex writeMutex;
         private static object instanceMutex = new object();
         int currentReaders = 0;
 
-        // Creates a singleton to be used for Authentication. This ensures that a new business layer object is not created whenever the server receives a call
+        // Creates a singleton to be used for Authentication.
+        // This ensures that a new business layer object is not created whenever the server receives a call
         private static volatile AuthBusinessLayer instance = null;
 
-        public static AuthBusinessLayer Create(string credentialsFilePath, string valTokenPath)
+        // Create the singleton isntance and or return it
+        public static AuthBusinessLayer Instance(string credentialsFilePath, string valTokenPath)
         {
             lock (instanceMutex)
             {
@@ -31,28 +34,8 @@ namespace Authenticator
                 {
                     instance = new AuthBusinessLayer(credentialsFilePath, valTokenPath);
 
-                    return instance;
                 }
-                else
-                {
-                    throw new InvalidOperationException("Instance has already been created. Please use RetrieveInstance function");
-                }
-
-            }
-        }
-
-        public static AuthBusinessLayer RetrieveInstance()
-        {
-            lock (instanceMutex)
-            {
-                if (instance != null)
-                {
-                    return instance;
-                }
-                else
-                {
-                    throw new InvalidOperationException("Instance has not been created. Please use Create function");
-                }
+                return instance;
             }
         }
 
@@ -70,6 +53,7 @@ namespace Authenticator
         {
             while (true)
             {
+                // Create the async time delay task. The cancellation token ensures there will be no zombie threads
                 Task delayTask = Task.Delay(TimeSpan.FromMinutes(timespanMinutes), cancellationToken);
                 cancellationToken.ThrowIfCancellationRequested();
                 await delayTask;
@@ -91,25 +75,52 @@ namespace Authenticator
             }
         }
 
+        // Logs the user in and provides a token which can be used to authenticate for other services
         public int Login(string username, string password)
         {
             int loginToken = 0;
             try
             {
+                // incrementing currentReaders must be atomic
+                mutexLock.WaitOne();
+                currentReaders++;
+                if (currentReaders == 1)
+                {
+                    writeMutex.WaitOne();
+                }
+                mutexLock.ReleaseMutex();
                 // A dictionary is used to build the map of user credentials. This will allow the function to easily parse and match usernames and passwords
                 Dictionary<string, string> credentialsDictionary = dataLayer.getCredDict();
-
+                mutexLock.WaitOne();
+                currentReaders--;
+                if (currentReaders == 0)
+                {
+                    writeMutex.ReleaseMutex();
+                }
+                mutexLock.ReleaseMutex();
 
                 // If a match is found for login, the temporary validation token is saved to the file and the token is then returned to the caller
                 if (matchCredentials(username, password, credentialsDictionary))
                 {
-                    writeMutex.WaitOne();
                     loginToken = dataLayer.writeValToken();
+                }
+                mutexLock.WaitOne();
+                currentReaders--;
+                if (currentReaders == 0)
+                {
                     writeMutex.ReleaseMutex();
                 }
+                mutexLock.ReleaseMutex();
             }
             catch (FileNotFoundException fnfe)
             {
+                mutexLock.WaitOne();
+                currentReaders--;
+                if (currentReaders == 0)
+                {
+                    writeMutex.ReleaseMutex();
+                }
+                mutexLock.ReleaseMutex();
                 AuthenticationException AuthEx = new AuthenticationException();
                 AuthEx.Details = fnfe.Message;
                 throw new FaultException<AuthenticationException>(AuthEx);
@@ -131,6 +142,7 @@ namespace Authenticator
             }
             catch (FileNotFoundException fnfe)
             {
+                writeMutex.ReleaseMutex();
                 AuthenticationException AuthEx = new AuthenticationException();
                 AuthEx.Details = fnfe.Message;
                 throw new FaultException<AuthenticationException>(AuthEx);
@@ -148,16 +160,16 @@ namespace Authenticator
                 if (currentReaders == 1)
                 {
                     writeMutex.WaitOne();
-                    mutexLock.ReleaseMutex();
                 }
+                mutexLock.ReleaseMutex();
                 List<int> tokenList = dataLayer.readValTokens();
                 mutexLock.WaitOne();
                 currentReaders--;
                 if (currentReaders == 0)
                 {
                     writeMutex.ReleaseMutex();
-                    mutexLock.ReleaseMutex();
                 }
+                mutexLock.ReleaseMutex();
 
                 // Each item in the list is checked against the provided token to see if there's a match
                 foreach (int item in tokenList)

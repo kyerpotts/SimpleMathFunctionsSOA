@@ -17,7 +17,7 @@ namespace Authenticator
             Console.WriteLine("Authentication Server is starting");
             ServiceHost host;
             NetTcpBinding tcp = new NetTcpBinding();
-            AuthBusinessLayer authBusinessLayer = AuthBusinessLayer.Create("authCredentialsFile.txt",
+            AuthBusinessLayer authBusinessLayer = AuthBusinessLayer.Instance("authCredentialsFile.txt",
                                                                            "authTokenFile.txt");
             // A timeframe must be provided for the interval clearing of tokens
             Console.WriteLine("Please provide a timeframe for session tokens to be cleared in minutes:");
