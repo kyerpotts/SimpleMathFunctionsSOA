@@ -12,13 +12,9 @@ namespace Authenticator
 {
     internal class Program
     {
-        static async Task Main(string[] args)
+        static void Main(string[] args)
         {
             Console.WriteLine("Authentication Server is starting");
-            ServiceHost host;
-            NetTcpBinding tcp = new NetTcpBinding();
-            AuthBusinessLayer authBusinessLayer = AuthBusinessLayer.Instance("authCredentialsFile.txt",
-                                                                           "authTokenFile.txt");
             // A timeframe must be provided for the interval clearing of tokens
             Console.WriteLine("Please provide a timeframe for session tokens to be cleared in minutes:");
             bool timeFrameProvided = false;
@@ -33,25 +29,30 @@ namespace Authenticator
                     timeFrameProvided = true;
                 }
             }
-            Task clearTokensTask = authBusinessLayer.ClearSavedTokens(timeFrame, cancellationTokenSource.Token);
 
-            host = new ServiceHost(authBusinessLayer);
-            host.AddServiceEndpoint(typeof(IAuthenticatorInterface), tcp, "net.tcp://0.0.0.0:8200/AuthenticationService");
+            ServiceHost host;
+            NetTcpBinding tcp = new NetTcpBinding();
+            //AuthBusinessLayer authBusinessLayer = AuthBusinessLayer.Instance("authCredentialsFile.txt",
+            //                                                               "authTokenFile.txt");
+            //Task clearTokensTask = authBusinessLayer.ClearSavedTokens(timeFrame, cancellationTokenSource.Token);
+
+            host = new ServiceHost(typeof(AuthBusinessLayer));
+            host.AddServiceEndpoint(typeof(IAuthenticatorInterface), tcp, "net.tcp://0.0.0.0:9000/AuthenticationService");
             host.Open();
             Console.WriteLine("System Online");
             Console.ReadLine();
 
             // Signal for the background tasks to be cancelled
-            cancellationTokenSource.Cancel();
-            try
-            {
-                await clearTokensTask;
-            }
-            catch (OperationCanceledException oce)
-            {
-                Console.WriteLine("Background threads successfully exited: " + oce.Message);
-                Console.ReadLine();
-            }
+            //cancellationTokenSource.Cancel();
+            //try
+            //{
+            //    //await clearTokensTask;
+            //}
+            //catch (OperationCanceledException oce)
+            //{
+            //    Console.WriteLine("Background threads successfully exited: " + oce.Message);
+            //    Console.ReadLine();
+            //}
 
             host.Close();
         }
