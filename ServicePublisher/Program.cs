@@ -12,16 +12,21 @@ namespace ServicePublisher
     {
         static void Main(string[] args)
         {
-            IAuthenticatorInterface authenticationServer;
-            ChannelFactory<IAuthenticatorInterface> authenticationServerFactory;
-            NetTcpBinding tcp = new NetTcpBinding();
-            string URL = "net.tcp://0.0.0.0:9000/AuthenticationService";
-            authenticationServerFactory = new ChannelFactory<IAuthenticatorInterface>(tcp, URL);
-            authenticationServer = authenticationServerFactory.CreateChannel();
+            AuthServer authServer = new AuthServer();
+            //IAuthenticatorInterface authenticationServer;
+            //ChannelFactory<IAuthenticatorInterface> authenticationServerFactory;
+            //NetTcpBinding tcp = new NetTcpBinding();
+            //string URL = "net.tcp://0.0.0.0:8200/AuthService";
+            //authenticationServerFactory = new ChannelFactory<IAuthenticatorInterface>(tcp, URL);
+            //authenticationServer = authenticationServerFactory.CreateChannel();
 
             try
             {
-                Console.WriteLine(authenticationServer.Validate(12345));
+                //authenticationServer.Register("user", "user");
+                //int token = authenticationServer.Login("user", "user");
+
+                Console.WriteLine(authServer.Validate(12345));
+                Console.ReadLine();
             }
             catch(FaultException<AuthenticationException> authEx)
             {

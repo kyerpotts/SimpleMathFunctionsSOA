@@ -1,5 +1,6 @@
 ﻿using APIEndpoint;
 using AuthenticatorInterface;
+using ServiceProvider.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,9 +33,9 @@ namespace ServiceProvider.Security
                 {
                     try
                     {
-                        ValidateUser valUser = new ValidateUser();
+                        AuthServer authServer = new AuthServer();
                         //if(!(token == 1234567))
-                        if (!(valUser.ValidateUserByAuthServer(token).Equals("validated")))
+                        if (!(authServer.Validate(token).Equals("validated")))
                         {
                             actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, Newtonsoft.Json.JsonConvert.SerializeObject(new { Status = "Denied", Reason = "Authentication Error" }));
                         }

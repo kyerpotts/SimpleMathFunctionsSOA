@@ -14,7 +14,7 @@ namespace Authenticator
     [ServiceBehavior(ConcurrencyMode = ConcurrencyMode.Multiple, UseSynchronizationContext = false, InstanceContextMode = InstanceContextMode.Single)]
     internal class AuthBusinessLayer : IAuthenticatorInterface
     {
-        private AuthDataLayer dataLayer = new AuthDataLayer("authCredentialsFile.txt", "authTokenFile.txt");
+        private readonly AuthDataLayer dataLayer = new AuthDataLayer("authCredentialsFile.txt", "authTokenFile.txt");
 
         private static AuthBusinessLayer instance = null;
 
