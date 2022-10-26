@@ -53,14 +53,32 @@ namespace Registry.Models
             }
         }
 
+        // When all endpoints are deleted, the file must still contain json data for the List<EndpointObject>
+        // In order to initialize it when other read/write operations are called
+        // This function may be redundant
         public static void DeleteAllEndpoints(string filePath)
         {
-
+            if (File.Exists(filePath))
+            {
+                // The file needs to be overwritten with an empty file
+                File.Create(filePath);
+                // An empty list of endpoint objects is instantiated to be written to the file
+                List<EndpointObject> emptyEndpointList = new List<EndpointObject>();
+                // The empty list of endpoint objects is written to the file to
+                WriteAllEndpoints(filePath, emptyEndpointList);
+            }
+            else
+            {
+                throw new FileNotFoundException();
+            }
         }
 
         public static void WriteAllEndpoints(string filePath, List<EndpointObject> endpoints)
         {
-
+            // File is overwritten with a blank file to ensure no data will be corrupted
+            File.Create(filePath);
+            // List of EndpointObjects is serialized into json and written to the text file
+            File.WriteAllText(filePath, JsonConvert.SerializeObject(endpoints));
         }
     }
 }
