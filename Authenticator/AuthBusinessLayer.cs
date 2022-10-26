@@ -19,47 +19,36 @@ namespace Authenticator
         private static AuthBusinessLayer instance = null;
 
         // Mutual exclusion objects to provide thread synchronization for readers and writers
-        Mutex mutexLock = new Mutex();
-        Mutex writeMutex = new Mutex();
+        Mutex mutexLock;
+        Mutex writeMutex;
         private static object instanceMutex = new object();
         int currentReaders = 0;
 
-        public static AuthBusinessLayer Instance
-        {
-            get
-            {
-                if (instance == null)
-                {
-                    instance = new AuthBusinessLayer();
-                }
-                return instance;
-            }
-        }
         // Creates a singleton to be used for Authentication.
         // This ensures that a new business layer object is not created whenever the server receives a call
         static AuthBusinessLayer() { }
 
-        // Create the singleton isntance and or return it
-        //public static AuthBusinessLayer Instance(string credentialsFilePath, string valTokenPath)
-        //{
-        //    lock (instanceMutex)
-        //    {
-        //        if (instance == null)
-        //        {
-        //            instance = new AuthBusinessLayer(credentialsFilePath, valTokenPath);
-        //        }
-        //        return instance;
-        //    }
-        //}
+        //Create the singleton isntance and or return it
+        public static AuthBusinessLayer Instance(string credentialsFilePath, string valTokenPath)
+        {
+            lock (instanceMutex)
+            {
+                if (instance == null)
+                {
+                    instance = new AuthBusinessLayer(credentialsFilePath, valTokenPath);
+                }
+                return instance;
+            }
+        }
 
         // Standard constructor made private to prevent instantiation outside of the singleton
-        //private AuthBusinessLayer(string credentialsFilePath, string valTokenPath)
-        //{
-        //    dataLayer = new AuthDataLayer(credentialsFilePath, valTokenPath);
+        private AuthBusinessLayer(string credentialsFilePath, string valTokenPath)
+        {
+            dataLayer = new AuthDataLayer(credentialsFilePath, valTokenPath);
 
-        //    mutexLock = new Mutex();
-        //    writeMutex = new Mutex();
-        //}
+            mutexLock = new Mutex();
+            writeMutex = new Mutex();
+        }
 
 
         // Uses the given timespan in minutes to determine when the validation tokens file needs to be cleared
@@ -169,21 +158,21 @@ namespace Authenticator
             {
                 // Tokenlist is shared amongst threads and therefor needs to be syncronized properly
                 // These threads are sync'd with a generic implementation of the readers/writers problem solution
-                //mutexLock.WaitOne();
-                //currentReaders++;
-                //if (currentReaders == 1)
-                //{
-                //    writeMutex.WaitOne();
-                //}
-                //mutexLock.ReleaseMutex();
+                mutexLock.WaitOne();
+                currentReaders++;
+                if (currentReaders == 1)
+                {
+                    writeMutex.WaitOne();
+                }
+                mutexLock.ReleaseMutex();
                 List<int> tokenList = dataLayer.readValTokens();
-                //mutexLock.WaitOne();
-                //currentReaders--;
-                //if (currentReaders == 0)
-                //{
-                //    writeMutex.ReleaseMutex();
-                //}
-                //mutexLock.ReleaseMutex();
+                mutexLock.WaitOne();
+                currentReaders--;
+                if (currentReaders == 0)
+                {
+                    writeMutex.ReleaseMutex();
+                }
+                mutexLock.ReleaseMutex();
 
                 // Each item in the list is checked against the provided token to see if there's a match
                 foreach (int item in tokenList)

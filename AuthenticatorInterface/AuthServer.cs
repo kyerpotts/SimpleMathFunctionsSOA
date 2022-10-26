@@ -6,9 +6,9 @@ using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServicePublisher
+namespace AuthenticatorInterface
 {
-    internal class AuthServer
+    public class AuthServer
     {
         private IAuthenticatorInterface authServer;
         public AuthServer()
@@ -27,11 +27,37 @@ namespace ServicePublisher
             {
                 validationReq = authServer.Validate(token);
             }
-            catch(FaultException<AuthenticationException> authex)
+            catch (FaultException<AuthenticationException> authex)
             {
                 Console.WriteLine(authex.Detail.Details);
             }
             return validationReq;
+        }
+
+        public int Login(string username, string password)
+        {
+            try
+            {
+                return authServer.Login(username, password);
+            }
+            catch(FaultException<AuthenticationException> authex)
+            {
+                Console.WriteLine(authex.Detail.Details);
+                return 0;
+            }
+        }
+
+        public string Register(string username, string password)
+        {
+            try
+            {
+            return authServer.Register(username, password);
+            }
+            catch(FaultException<AuthenticationException> authex)
+            {
+                Console.WriteLine(authex.Detail.Details);
+                return "Registration Unsuccessful";
+            }
         }
     }
 }

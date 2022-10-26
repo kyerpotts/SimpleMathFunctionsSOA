@@ -32,9 +32,9 @@ namespace Registry.Security
                 {
                     try
                     {
-                        ValidateUser valUser = new ValidateUser();
+                        AuthServer valUser = new AuthServer();
                         //if(!(token == 1234567)) Testing to see if this works accurately.
-                        if (!(valUser.ValidateUserByAuthServer(token).Equals("validated")))
+                        if (!(valUser.Validate(token).Equals("validated")))
                         {
                             actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, Newtonsoft.Json.JsonConvert.SerializeObject(new { Status = "Denied", Reason = "Authentication Error" }));
                         }

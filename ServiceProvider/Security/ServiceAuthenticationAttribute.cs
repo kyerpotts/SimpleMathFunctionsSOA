@@ -1,6 +1,5 @@
 ﻿using APIEndpoint;
 using AuthenticatorInterface;
-using ServiceProvider.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

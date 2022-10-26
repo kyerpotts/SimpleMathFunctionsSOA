@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AuthenticationException.cs" />
+    <Compile Include="AuthServer.cs" />
     <Compile Include="IAuthenticatorInterface.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
