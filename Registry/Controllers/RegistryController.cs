@@ -1,4 +1,5 @@
 ﻿using APIEndpoint;
+using Newtonsoft.Json;
 using Registry.Models;
 using Registry.Security;
 using System;
@@ -29,7 +30,7 @@ namespace Registry.Controllers
             }
             catch (IOException)
             {
-                return Content(HttpStatusCode.BadRequest, new ReturnStatus { Status = "Denied", Reason = "An error occured when processing the request" });
+                return BadRequest(JsonConvert.SerializeObject(new ReturnStatus { Status = "Denied", Reason = "An error occured while processing the request" }));
             }
         }
 
@@ -47,14 +48,14 @@ namespace Registry.Controllers
             }
             catch (IOException)
             {
-                return Content(HttpStatusCode.BadRequest, new ReturnStatus { Status = "Denied", Reason = "An error occured when processing the request" });
+                return BadRequest(JsonConvert.SerializeObject(new ReturnStatus { Status = "Denied", Reason = "An error occured while processing the request" }));
             }
         }
 
         [Route("allservices")]
         [HttpGet]
         [ServiceAuthentication]
-        public IHttpActionResult AllServices(string searchterm)
+        public IHttpActionResult AllServices()
         {
             try
             {
@@ -63,24 +64,31 @@ namespace Registry.Controllers
             }
             catch (IOException)
             {
-                return Content(HttpStatusCode.BadRequest, new ReturnStatus { Status = "Denied", Reason = "An error occured when processing the request" });
+                return BadRequest(JsonConvert.SerializeObject(new ReturnStatus { Status = "Denied", Reason = "An error occured while processing the request" }));
             }
         }
 
-        [Route("unpublish/{jEndpoint}")]
+        [Route("unpublish/{jEndpointName}")]
         [Route("unpublish")]
         [HttpDelete]
         [ServiceAuthentication]
-        public IHttpActionResult Unpublish(string jEndpoint)
+        public IHttpActionResult Unpublish(string jEndpointName)
         {
             try
             {
                 List<EndpointObject> returnList = RegistryBusinessLayer.GetAllEndpoints(endpointFilePath);
-                return Ok(returnList);
+                if (RegistryBusinessLayer.DeleteEndpoint(endpointFilePath, jEndpointName))
+                {
+                    return Ok(returnList);
+                }
+                else
+                {
+                    return BadRequest(JsonConvert.SerializeObject(new ReturnStatus { Status = "Denied", Reason = "Could not unpublish endpoint" }));
+                }
             }
             catch (IOException)
             {
-                return Content(HttpStatusCode.BadRequest, new ReturnStatus { Status = "Denied", Reason = "An error occured when processing the request" });
+                return BadRequest(JsonConvert.SerializeObject(new ReturnStatus { Status = "Denied", Reason = "An error occured while processing the request" }));
             }
         }
     }

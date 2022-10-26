@@ -15,7 +15,7 @@ namespace Registry.Security
         {
             ChannelFactory<IAuthenticatorInterface> authenticationServerFactory;
             NetTcpBinding tcp = new NetTcpBinding();
-            string URL = "net.tcp://0.0.0.0:8100/AuthenticationService";
+            string URL = "net.tcp://0.0.0.0:8200/AuthenticationService";
             authenticationServerFactory = new ChannelFactory<IAuthenticatorInterface>(tcp, URL);
             authenticationServer = authenticationServerFactory.CreateChannel();
         }

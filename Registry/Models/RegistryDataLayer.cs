@@ -58,19 +58,10 @@ namespace Registry.Models
         // This function may be redundant
         public static void DeleteAllEndpoints(string filePath)
         {
-            if (File.Exists(filePath))
-            {
-                // The file needs to be overwritten with an empty file
-                File.Create(filePath);
                 // An empty list of endpoint objects is instantiated to be written to the file
                 List<EndpointObject> emptyEndpointList = new List<EndpointObject>();
                 // The empty list of endpoint objects is written to the file to
                 WriteAllEndpoints(filePath, emptyEndpointList);
-            }
-            else
-            {
-                throw new FileNotFoundException();
-            }
         }
 
         public static void WriteAllEndpoints(string filePath, List<EndpointObject> endpoints)

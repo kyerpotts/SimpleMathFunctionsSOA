@@ -36,7 +36,7 @@ namespace Authenticator
             Task clearTokensTask = authBusinessLayer.ClearSavedTokens(timeFrame, cancellationTokenSource.Token);
 
             host = new ServiceHost(authBusinessLayer);
-            host.AddServiceEndpoint(typeof(IAuthenticatorInterface), tcp, "net.tcp://0.0.0.0:8100/AuthenticationService");
+            host.AddServiceEndpoint(typeof(IAuthenticatorInterface), tcp, "net.tcp://0.0.0.0:8200/AuthenticationService");
             host.Open();
             Console.WriteLine("System Online");
             Console.ReadLine();

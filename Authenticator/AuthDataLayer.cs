@@ -24,11 +24,11 @@ namespace Authenticator
             // Need to check if credentials file exists before creating to ensure user data is not wiped
             if (!File.Exists(credentialsFilePath))
             {
-                File.CreateText(credentialsFilePath);
+                File.CreateText(credentialsFilePath).Dispose();
             }
 
             // Token file will always be invalid when server starts up so will always need to be overwritten if it exists.
-            File.CreateText(valTokenFilePath);
+            File.CreateText(valTokenFilePath).Dispose();
         }
 
         // The user credentials supplied are appended to an existing file, delineating each string with a ":" character in order to parse later
@@ -128,7 +128,7 @@ namespace Authenticator
         public void clearAllValTokens()
         {
             // The file can be quickly recreated with the same path rather than opening the file and removing the contents
-            File.CreateText(valTokenFilePath);
+            File.CreateText(valTokenFilePath).Dispose();
         }
     }
 }
