@@ -22,7 +22,7 @@ namespace Registry.Security
         {
             if (actionContext.Request.Headers.Authorization == null)
             {
-                actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, "No authentication token supplied");
+                actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, new ReturnStatus { Status = "Denied", Reason = "Authentication Error" });
             }
             else
             {
@@ -36,17 +36,17 @@ namespace Registry.Security
                         //if(!(token == 1234567)) Testing to see if this works accurately.
                         if (!(valUser.Validate(token).Equals("validated")))
                         {
-                            actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, Newtonsoft.Json.JsonConvert.SerializeObject(new { Status = "Denied", Reason = "Authentication Error" }));
+                            actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, new ReturnStatus { Status = "Denied", Reason = "Authentication Error 1" });
                         }
                     }
                     catch (FaultException<AuthenticationException>)
                     {
-                        actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, Newtonsoft.Json.JsonConvert.SerializeObject(new { Status = "Denied", Reason = "Authentication Error" }));
+                        actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, new ReturnStatus { Status = "Denied", Reason = "Authentication Error 2" });
                     }
                 }
                 else
                 {
-                    actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, Newtonsoft.Json.JsonConvert.SerializeObject(new { Status = "Denied", Reason = "Authentication Error" }));
+                    actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, new ReturnStatus { Status = "Denied", Reason = "Authentication Error 3" });
                 }
             }
             base.OnAuthorization(actionContext);

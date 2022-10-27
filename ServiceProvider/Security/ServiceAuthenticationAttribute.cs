@@ -33,8 +33,8 @@ namespace ServiceProvider.Security
                     try
                     {
                         AuthServer authServer = new AuthServer();
-                        //if(!(token == 1234567))
-                        if (!(authServer.Validate(token).Equals("validated")))
+                        //if(!(token == 1234567)) Testing to see if this works accurately.
+                        if (!(authServer.Validate(token).Equals("validated")) || !(token == 123456))
                         {
                             actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, Newtonsoft.Json.JsonConvert.SerializeObject(new { Status = "Denied", Reason = "Authentication Error" }));
                         }

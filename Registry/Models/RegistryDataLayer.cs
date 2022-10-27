@@ -12,27 +12,32 @@ namespace Registry.Models
     internal static class RegistryDataLayer
     {
         // Writes an endpoint to the file in Json
-        public static void WriteEndPoint(string filePath, string jEndpoint)
+        public static void WriteEndPoint(string filePath, EndpointObject jEndpoint)
         {
             // If the file exists the current endpoints need to be read and deserialized before adding to them
             if (File.Exists(filePath))
             {
                 // Read all of the endpoints from the file
                 List<EndpointObject> endpoints = ReadEndpoints(filePath);
+
+                // If the file is empty the List will be null, so instantiate the list
+                if (endpoints == null)
+                {
+                    endpoints = new List<EndpointObject>();
+                }
                 // The new endpoint needs to be added to the list
-                endpoints.Add(JsonConvert.DeserializeObject<EndpointObject>(jEndpoint));
+                endpoints.Add(jEndpoint);
                 // Once the new endpoint has been added, the entire file is rewritten.
                 // This will not scale well but should be fine for a small number of endpoints
                 File.WriteAllText(filePath, JsonConvert.SerializeObject(endpoints));
             }
             else
             {
-                // If the file does not exist it needs to be created, and a new list of endpoints initialized
-                File.Create(filePath);
                 List<EndpointObject> endpoints = new List<EndpointObject>();
                 // The new endpoint is added to the fresh list and then written to the file.
-                endpoints.Add(JsonConvert.DeserializeObject<EndpointObject>(jEndpoint));
-                File.WriteAllText(filePath, JsonConvert.SerializeObject(endpoints));
+                endpoints.Add(jEndpoint);
+                //endpoints.Add(JsonConvert.DeserializeObject<EndpointObject>(jEndpoint));
+                WriteAllEndpoints(filePath, endpoints);
             }
         }
 
@@ -67,7 +72,7 @@ namespace Registry.Models
         public static void WriteAllEndpoints(string filePath, List<EndpointObject> endpoints)
         {
             // File is overwritten with a blank file to ensure no data will be corrupted
-            File.Create(filePath);
+            File.Create(filePath).Dispose();
             // List of EndpointObjects is serialized into json and written to the text file
             File.WriteAllText(filePath, JsonConvert.SerializeObject(endpoints));
         }

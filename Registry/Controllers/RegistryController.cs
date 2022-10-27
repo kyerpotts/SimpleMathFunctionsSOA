@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Web.Hosting;
 using System.Web.Http;
 
 namespace Registry.Controllers
@@ -15,13 +16,13 @@ namespace Registry.Controllers
     [RoutePrefix("api/registry")]
     public class RegistryController : ApiController
     {
-        string endpointFilePath = "APIEndpoints.txt";
+        string endpointFilePath = (HostingEnvironment.MapPath("~/APIReg.txt"));
 
         [Route("publish/{jEndpoint}")]
         [Route("publish")]
         [HttpPost]
         [ServiceAuthentication]
-        public IHttpActionResult Publish(string jEndpoint)
+        public IHttpActionResult Publish([FromBody] EndpointObject jEndpoint)
         {
             try
             {
@@ -79,7 +80,7 @@ namespace Registry.Controllers
                 List<EndpointObject> returnList = RegistryBusinessLayer.GetAllEndpoints(endpointFilePath);
                 if (RegistryBusinessLayer.DeleteEndpoint(endpointFilePath, jEndpointName))
                 {
-                    return Ok(returnList);
+                    return Ok(new ReturnStatus {  Status = "Accepted", Reason = "Endpoint successfully unpublished."});
                 }
                 else
                 {

@@ -143,12 +143,10 @@ namespace Authenticator
                 writeMutex.ReleaseMutex();
                 return "Successfully Registered";
             }
-            catch (FileNotFoundException fnfe)
+            catch (FileNotFoundException )
             {
                 writeMutex.ReleaseMutex();
-                AuthenticationException AuthEx = new AuthenticationException();
-                AuthEx.Details = fnfe.Message;
-                throw new FaultException<AuthenticationException>(AuthEx);
+                return "Registration Unsuccessful";
             }
         }
 

@@ -8,7 +8,7 @@ namespace Registry.Models
 {
     internal static class RegistryBusinessLayer
     {
-        public static void WriteAPIEndpointToFile(string filePath, string jEndpoint)
+        public static void WriteAPIEndpointToFile(string filePath, EndpointObject jEndpoint)
         {
             RegistryDataLayer.WriteEndPoint(filePath, jEndpoint);
         }
