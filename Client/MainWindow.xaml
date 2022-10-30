@@ -16,13 +16,13 @@
         <Button x:Name="btnRegister" Content="Register" HorizontalAlignment="Left" Margin="61,320,0,0" VerticalAlignment="Top" Click="btnRegister_Click"/>
         <Rectangle HorizontalAlignment="Left" Height="400" Margin="170,0,0,0" Stroke="Black" VerticalAlignment="Center" Width="1"/>
         <Button x:Name="btnGetAllServices" Content="Get all Services" HorizontalAlignment="Center" Margin="0,49,0,0" VerticalAlignment="Top" Width="100" Height="50" Click="btnGetAllServices_Click"/>
-        <TextBox x:Name="tbSearchService" HorizontalAlignment="Left" Margin="191,110,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="260" Height="20"/>
-        <Button x:Name="btnSearchService" Content="Search a Service" HorizontalAlignment="Left" Margin="191,49,0,0" VerticalAlignment="Top" Width="100" Height="50" RenderTransformOrigin="-0.748,0.079"/>
+        <TextBox x:Name="tbSearchService" HorizontalAlignment="Left" Margin="191,110,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="259" Height="20"/>
+        <Button x:Name="btnSearchService" Content="Search a Service" HorizontalAlignment="Left" Margin="191,49,0,0" VerticalAlignment="Top" Width="100" Height="50" RenderTransformOrigin="-0.748,0.079" Click="btnSearchService_Click"/>
         <Rectangle HorizontalAlignment="Left" Height="400" Margin="472,0,0,0" Stroke="Black" VerticalAlignment="Center" Width="1"/>
-        <Button x:Name="btnTest" Content="TEST" HorizontalAlignment="Left" Margin="498,327,0,0" VerticalAlignment="Top" Width="100" Height="50"/>
+        <Button x:Name="btnTest" Content="TEST" HorizontalAlignment="Left" Margin="498,327,0,0" VerticalAlignment="Top" Width="100" Height="50" Click="btnTest_Click"/>
         <Label x:Name="labTestOutputlab" Content="Test Output: " HorizontalAlignment="Left" Margin="622,339,0,0" VerticalAlignment="Top"/>
         <Label x:Name="labTestOutput" Content="" HorizontalAlignment="Left" Margin="705,339,0,0" VerticalAlignment="Top" Width="50"/>
-        <ListView x:Name="lvServicesList" Margin="190,147,350,17" Width="260" Height="270">
+        <ListView x:Name="lvServicesList" Margin="191,147,350,17" SelectionChanged="lvServicesList_SelectionChanged">
             <ListView.ItemTemplate>
                 <DataTemplate>
                     <WrapPanel>
@@ -31,5 +31,7 @@
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>
+        <StackPanel x:Name="spInputControls" Orientation="Vertical" VerticalAlignment="Top" Height="263" Margin="498,49,25,0"/>
+
     </Grid>
 </Window>

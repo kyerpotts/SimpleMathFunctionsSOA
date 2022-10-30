@@ -40,10 +40,11 @@ namespace AuthenticatorInterface
             {
                 return authServer.Login(username, password);
             }
-            catch (FaultException<AuthenticationException> authex)
+            catch (EndpointNotFoundException epnfe)
             {
-                Console.WriteLine(authex.Detail.Details);
-                return 0;
+                AuthenticationException authex = new AuthenticationException();
+                authex.Details = epnfe.Message;
+                throw new FaultException<AuthenticationException>(authex) ;
             }
         }
 

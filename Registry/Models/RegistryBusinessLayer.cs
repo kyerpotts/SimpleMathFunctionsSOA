@@ -19,7 +19,7 @@ namespace Registry.Models
             List<EndpointObject> endpoints = RegistryDataLayer.ReadEndpoints(filePath);
             foreach (EndpointObject endpoint in endpoints)
             {
-                if (endpoint.Description.IndexOf(searchterm, StringComparison.OrdinalIgnoreCase) > -1)
+                if (endpoint.Description.ToLower().Contains(searchterm.ToLower()))
                 {
                     matchedEndpoints.Add(endpoint);
                 }
