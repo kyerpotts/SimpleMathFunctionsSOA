@@ -9,10 +9,10 @@
     <Grid>
         <Label Content="Username" HorizontalAlignment="Center" Margin="0,127,0,0" VerticalAlignment="Top"/>
         <Label Content="Password" HorizontalAlignment="Center" VerticalAlignment="Top" HorizontalContentAlignment="Center" Margin="0,186,0,0"/>
-        <Button x:Name="btnRegister" Content="Register" HorizontalAlignment="Center" Margin="0,266,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.585,0.473"/>
+        <Button x:Name="btnRegister" Content="Register" HorizontalAlignment="Center" Margin="0,266,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.585,0.473" Click="btnRegister_Click"/>
         <TextBox x:Name="tbUsername" HorizontalAlignment="Center" Margin="0,158,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
         <TextBox x:Name="tbPassword" HorizontalAlignment="Center" Margin="0,217,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" Text=""/>
-        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="230,377,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="btnCancel" Content="Cancel" HorizontalAlignment="Left" Margin="230,377,0,0" VerticalAlignment="Top" Click="btnCancel_Click"/>
         <Label Content="REGISTER" HorizontalAlignment="Center" Margin="0,29,0,0" VerticalAlignment="Top" FontSize="22" FontWeight="Bold"/>
 
     </Grid>

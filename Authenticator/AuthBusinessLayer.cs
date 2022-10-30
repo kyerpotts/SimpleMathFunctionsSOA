@@ -143,7 +143,7 @@ namespace Authenticator
                 writeMutex.ReleaseMutex();
                 return "Successfully Registered";
             }
-            catch (FileNotFoundException )
+            catch (FileNotFoundException)
             {
                 writeMutex.ReleaseMutex();
                 return "Registration Unsuccessful";

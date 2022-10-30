@@ -1,1 +1,1 @@
-[]
+[{"Name":"AddTwoNumbers","Description":"AddTwoNumbers","APIendpoint":"addtwonumbers","NumOperands":2,"OperandType":"integer"}]

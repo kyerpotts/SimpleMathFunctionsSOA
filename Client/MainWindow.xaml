@@ -12,16 +12,24 @@
         <TextBox x:Name="tbPassword" HorizontalAlignment="Left" Margin="25,240,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
         <Label Content="Username" HorizontalAlignment="Left" Margin="53,146,0,0" VerticalAlignment="Top"/>
         <Label Content="Password" HorizontalAlignment="Left" Margin="55,209,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="btnRegister1" Content="Login" HorizontalAlignment="Left" Margin="68,284,0,0" VerticalAlignment="Top"/>
-        <Button x:Name="btnRegister" Content="Register" HorizontalAlignment="Left" Margin="61,320,0,0" VerticalAlignment="Top"/>
+        <Button x:Name="btnLogin" Content="Login" HorizontalAlignment="Left" Margin="68,284,0,0" VerticalAlignment="Top" Click="btnLogin_Click"/>
+        <Button x:Name="btnRegister" Content="Register" HorizontalAlignment="Left" Margin="61,320,0,0" VerticalAlignment="Top" Click="btnRegister_Click"/>
         <Rectangle HorizontalAlignment="Left" Height="400" Margin="170,0,0,0" Stroke="Black" VerticalAlignment="Center" Width="1"/>
-        <Button x:Name="btnGetAllServices" Content="Get all Services" HorizontalAlignment="Center" Margin="0,49,0,0" VerticalAlignment="Top" Width="100" Height="50"/>
-        <ListBox x:Name="lbServicesList" d:ItemsSource="{d:SampleData ItemCount=5}" Margin="190,147,350,17" Width="260" Height="270"/>
+        <Button x:Name="btnGetAllServices" Content="Get all Services" HorizontalAlignment="Center" Margin="0,49,0,0" VerticalAlignment="Top" Width="100" Height="50" Click="btnGetAllServices_Click"/>
         <TextBox x:Name="tbSearchService" HorizontalAlignment="Left" Margin="191,110,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="260" Height="20"/>
         <Button x:Name="btnSearchService" Content="Search a Service" HorizontalAlignment="Left" Margin="191,49,0,0" VerticalAlignment="Top" Width="100" Height="50" RenderTransformOrigin="-0.748,0.079"/>
         <Rectangle HorizontalAlignment="Left" Height="400" Margin="472,0,0,0" Stroke="Black" VerticalAlignment="Center" Width="1"/>
         <Button x:Name="btnTest" Content="TEST" HorizontalAlignment="Left" Margin="498,327,0,0" VerticalAlignment="Top" Width="100" Height="50"/>
-        <Label Content="Test Output: " HorizontalAlignment="Left" Margin="622,339,0,0" VerticalAlignment="Top"/>
-        <Label x:Name="lbTestOutput" Content="" HorizontalAlignment="Left" Margin="705,339,0,0" VerticalAlignment="Top" Width="50"/>
+        <Label x:Name="labTestOutputlab" Content="Test Output: " HorizontalAlignment="Left" Margin="622,339,0,0" VerticalAlignment="Top"/>
+        <Label x:Name="labTestOutput" Content="" HorizontalAlignment="Left" Margin="705,339,0,0" VerticalAlignment="Top" Width="50"/>
+        <ListView x:Name="lvServicesList" Margin="190,147,350,17" Width="260" Height="270">
+            <ListView.ItemTemplate>
+                <DataTemplate>
+                    <WrapPanel>
+                        <TextBlock Text="{Binding Description}" FontWeight="Bold"/>
+                    </WrapPanel>
+                </DataTemplate>
+            </ListView.ItemTemplate>
+        </ListView>
     </Grid>
 </Window>

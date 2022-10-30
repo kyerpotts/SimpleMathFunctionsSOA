@@ -12,7 +12,7 @@ namespace Authenticator
 {
     internal class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Console.WriteLine("Authentication Server is starting");
             // A timeframe must be provided for the interval clearing of tokens
@@ -31,29 +31,30 @@ namespace Authenticator
             }
 
             AuthBusinessLayer authBusinessLayer = AuthBusinessLayer.Instance("authCredentialsFile.txt", "authTokenFile.txt");
-            Task clearTokensTask = authBusinessLayer.ClearSavedTokens(timeFrame, cancellationTokenSource.Token);
-
             ServiceHost host;
             NetTcpBinding tcp = new NetTcpBinding();
             host = new ServiceHost(AuthBusinessLayer.Instance("authCredentialsFile.txt", "authTokenFile.txt"));
             host.AddServiceEndpoint(typeof(IAuthenticatorInterface), tcp, "net.tcp://0.0.0.0:8200/AuthService");
             host.Open();
-            Console.WriteLine("System Online");
-            Console.ReadLine();
 
             // Signal for the background tasks to be cancelled
-            cancellationTokenSource.Cancel();
             try
             {
-                //await clearTokensTask;
+                Task clearTokensTask = authBusinessLayer.ClearSavedTokens(timeFrame, cancellationTokenSource.Token);
+                Console.WriteLine("System Online");
+                Console.ReadLine();
+                cancellationTokenSource.Cancel();
+                await clearTokensTask;
             }
             catch (OperationCanceledException oce)
             {
                 Console.WriteLine("Background threads successfully exited: " + oce.Message);
                 Console.ReadLine();
             }
-
-            host.Close();
+            finally
+            {
+                host.Close();
+            }
         }
     }
 }

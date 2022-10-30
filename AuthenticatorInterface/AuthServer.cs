@@ -40,7 +40,7 @@ namespace AuthenticatorInterface
             {
                 return authServer.Login(username, password);
             }
-            catch(FaultException<AuthenticationException> authex)
+            catch (FaultException<AuthenticationException> authex)
             {
                 Console.WriteLine(authex.Detail.Details);
                 return 0;
@@ -51,9 +51,9 @@ namespace AuthenticatorInterface
         {
             try
             {
-            return authServer.Register(username, password);
+                return authServer.Register(username, password);
             }
-            catch(FaultException<AuthenticationException> authex)
+            catch (FaultException<AuthenticationException> authex)
             {
                 Console.WriteLine(authex.Detail.Details);
                 return "Registration Unsuccessful";

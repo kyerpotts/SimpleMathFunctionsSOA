@@ -12,6 +12,11 @@ namespace APIEndpoint
         public string Description { get; set; }
         public string APIendpoint { get; set; }
         public int NumOperands { get; set; } 
-        public string OperandType { get; set; } 
+        public string OperandType { get; set; }
+
+        public override string ToString()
+        {
+            return Description;
+        }
     }
 }
