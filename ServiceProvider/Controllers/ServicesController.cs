@@ -11,40 +11,40 @@ namespace ServiceProvider.Controllers
     [RoutePrefix("api/services")]
     public class ServicesController : ApiController
     {
-        [Route("addtwonumbers/{firstnum}/{secondnum}")]
+        [Route("addtwonumbers/{operand1}/{operand2}")]
         [Route("addtwonumbers")]
         [HttpGet]
         [ServiceAuthentication]
-        public IHttpActionResult AddTwoNumbers(int firstnum, int secondnum)
+        public IHttpActionResult AddTwoNumbers(int operand1, int operand2)
         {
-            return Ok(firstnum + secondnum);
+            return Ok(operand1 + operand2);
         }
 
-        [Route("addthreenumbers/{firstnum}/{secondnum}/{thirdnum}")]
+        [Route("addthreenumbers/{operand1}/{operand2}/{operand3}")]
         [Route("addthreenumbers")]
         [HttpGet]
         [ServiceAuthentication]
-        public IHttpActionResult AddThreeNumbers(int firstnum, int secondnum, int thirdnum)
+        public IHttpActionResult AddThreeNumbers(int operand1, int operand2,int operand3)
         {
-            return Ok(firstnum + secondnum + thirdnum);
+            return Ok(operand1 + operand2 + operand3);
         }
 
-        [Route("multwonumbers/{firstnum}/{secondnum}")]
+        [Route("multwonumbers/{operand1}/{operand2}")]
         [Route("multwonumbers")]
         [HttpGet]
         [ServiceAuthentication]
-        public IHttpActionResult MulTwoNumbers(int firstnum, int secondnum)
+        public IHttpActionResult MulTwoNumbers(int operand1, int operand2)
         {
-            return Ok(firstnum * secondnum);
+            return Ok(operand1 * operand2);
         }
 
-        [Route("multhreenumbers/{firstnum}/{secondnum}/{thirdnum}")]
+        [Route("multhreenumbers/{operand1}/{operand2}/{operand3}")]
         [Route("mullthreenumbers")]
         [HttpGet]
         [ServiceAuthentication]
-        public IHttpActionResult MulThreeNumbers(int firstnum, int secondnum, int thirdnum)
+        public IHttpActionResult MulThreeNumbers(int operand1, int operand2, int operand3)
         {
-            return Ok(firstnum * secondnum * thirdnum);
+            return Ok(operand1 * operand2 * operand3);
         }
     }
 }

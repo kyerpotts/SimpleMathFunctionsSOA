@@ -22,7 +22,7 @@ namespace ServiceProvider.Security
         {
             if (actionContext.Request.Headers.Authorization == null)
             {
-                actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, "No authentication token supplied");
+                actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, Newtonsoft.Json.JsonConvert.SerializeObject(new { Status = "Denied", Reason = "Authentication Error" }));
             }
             else
             {
@@ -33,8 +33,8 @@ namespace ServiceProvider.Security
                     try
                     {
                         AuthServer authServer = new AuthServer();
-                        //if(!(token == 1234567)) Testing to see if this works accurately.
-                        if (!(authServer.Validate(token).Equals("validated")) || !(token == 123456))
+                        //if(!(token == 1234567)) // Testing to see if this works accurately.
+                        if (!(authServer.Validate(token).Equals("validated")))
                         {
                             actionContext.Response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest, Newtonsoft.Json.JsonConvert.SerializeObject(new { Status = "Denied", Reason = "Authentication Error" }));
                         }

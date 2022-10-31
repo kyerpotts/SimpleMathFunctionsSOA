@@ -77,6 +77,18 @@ namespace Client
             lvServicesList.Dispatcher.Invoke(() => lvServicesList.Visibility = Visibility.Visible);
         }
 
+        private void StartProgressBar()
+        {
+            ProgressBar pBar = pbAsyncProgress;
+            pBar.IsIndeterminate = true;
+        }
+
+        private void StopProgressBar()
+        {
+            ProgressBar pBar = pbAsyncProgress;
+            pBar.IsIndeterminate = false;
+        }
+
         // Async operation to validate a users login credentials and provide an authentication token.
         public async Task userLogin()
         {
@@ -174,7 +186,7 @@ namespace Client
                         }
                         if (addEP)
                         {
-                            ePList.Add(tempList[0]);
+                            ePList.Add(tempEP);
                         }
                     }
                 }
@@ -200,6 +212,77 @@ namespace Client
             labTestOutputlab.Visibility = Visibility.Visible;
         }
 
+        private async Task TestEndpoint()
+        {
+            await Task.Run(() =>
+            {
+                EndpointObject endpoint = null;
+                lvServicesList.Dispatcher.Invoke(() => endpoint = (EndpointObject)lvServicesList.SelectedItem);
+
+                // Populating the rest request with the endpoint and authorization information
+                RestRequest testRequest = new RestRequest(endpoint.APIendpoint, Method.Get).AddHeader("Authorization", " Basic " + token.ToString());
+                bool checkOperands = true;
+                int opNum = 0;
+
+                int spChildrenCount = 0;
+                spInputControls.Dispatcher.Invoke(() => spChildrenCount = spInputControls.Children.Count);
+
+                // Loops through each Textbox within the stack panel to retrieve values
+                for (int i = 0; i < spChildrenCount; i++)
+                {
+                    TextBox tb = null;
+                    spInputControls.Dispatcher.Invoke(() => tb = (TextBox)spInputControls.Children[i]);
+                    opNum++;
+                    string tbVal = "";
+                    // Retrieve the text from the texbox
+                    spInputControls.Dispatcher.Invoke(() =>
+                    {
+                        tbVal = tb.Text;
+                    });
+                    // Check if the text is null, if it is empty, the request is invalid
+                    if (tbVal.Equals(""))
+                    {
+                        checkOperands = false;
+                    }
+                    else
+                    {
+                        int operand;
+                        if (int.TryParse(tbVal, out operand))
+                        {
+                            // opNum is added to the URL to identify the correct textbox value
+                            testRequest.AddUrlSegment("operand" + opNum, operand);
+                        }
+                        else
+                        {
+                            checkOperands = false;
+                        }
+                    }
+                }
+
+                if (checkOperands)
+                {
+                    // The request needs to be executed asyncronously
+                    RestResponse resp = servClient.Execute(testRequest);
+                    if (resp.IsSuccessful)
+                    {
+                        labTestOutput.Dispatcher.Invoke(() => labTestOutput.Content = resp.Content.ToString());
+                    }
+                    // If unsuccessful, and error message is generated to let the user know and then continues
+                    else
+                    {
+                        var badResponseMsg = new { Message = "" };
+                        badResponseMsg = JsonConvert.DeserializeAnonymousType(resp.Content, badResponseMsg);
+                        ReturnStatus reStat = JsonConvert.DeserializeObject<ReturnStatus>(badResponseMsg.Message);
+                        MessageBox.Show(reStat.Status + ": " + reStat.Reason, "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Operands were invalid. Please ensure fields are not empty and integers are used.", "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            });
+        }
+
         // This method is not async as any new UI element must be opened from within the UI thread.
         private void btnRegister_Click(object sender, RoutedEventArgs e)
         {
@@ -209,10 +292,13 @@ namespace Client
 
         private async void btnLogin_Click(object sender, RoutedEventArgs e)
         {
+            StartProgressBar();
             await userLogin();
+            StopProgressBar();
         }
         private async void btnSearchService_Click(object sender, RoutedEventArgs e)
         {
+            StartProgressBar();
             string searchTerm = "";
             tbSearchService.Dispatcher.Invoke(() =>
             {
@@ -220,63 +306,25 @@ namespace Client
             });
 
             endpointList = await SearchServices(searchTerm, regClient, endpointList);
+            StopProgressBar();
         }
 
         private async void btnGetAllServices_Click(object sender, RoutedEventArgs e)
         {
+            StartProgressBar();
             endpointList = await GetAllServices(regClient, endpointList);
-        }
-
-        private void lvServicesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            PopulateFieldsFromSelection((EndpointObject)e.AddedItems[0]);
+            StopProgressBar();
         }
 
         private async void btnTest_Click(object sender, RoutedEventArgs e)
         {
-            EndpointObject endpoint = (EndpointObject)lvServicesList.SelectedItem;
-
-            // Populating the rest request with the endpoint and authorization information
-            RestRequest testRequest = new RestRequest(endpoint.APIendpoint, Method.Get).AddHeader("Authorization", " Basic " + token.ToString());
-            bool checkOperands = spInputControls.Children.GetEnumerator().MoveNext();
-            while (checkOperands)
-            {
-                string tbVal = "";
-                // Retrieve the text from the texbox
-                spInputControls.Dispatcher.Invoke(() =>
-                {
-                    TextBox tb = (TextBox)spInputControls.Children.GetEnumerator().Current;
-                    tbVal = tb.Text;
-                });
-                // Check if the text is null
-                if (tbVal.Equals(""))
-                {
-                    checkOperands = false;
-                }
-                else
-
-                testRequest.AddJsonBody();
-
-            }
-            // The request needs to be executed asyncronously
-            RestResponse resp = await regClient.ExecuteGetAsync(getAllRequest);
-
-            // The list of endpoints needs to be deserialized if the request is successful
-            if (resp.IsSuccessful)
-            {
-                ObservableCollection<EndpointObject> tempList = JsonConvert.DeserializeObject<ObservableCollection<EndpointObject>>(resp.Content);
-                return await AddEPItems(tempList, ePList);
-            }
-            // If unsuccessful, and error message is generated to let the user know and then continues
-            else
-            {
-                var badResponseMsg = new { Message = "" };
-                badResponseMsg = JsonConvert.DeserializeAnonymousType(resp.Content, badResponseMsg);
-                ReturnStatus reStat = JsonConvert.DeserializeObject<ReturnStatus>(badResponseMsg.Message);
-                MessageBox.Show(reStat.Status + ": " + reStat.Reason, "Failed", MessageBoxButton.OK, MessageBoxImage.Error);
-                return ePList;
-            }
-
+            StartProgressBar();
+            await TestEndpoint();
+            StopProgressBar();
+        }
+        private void lvServicesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            PopulateFieldsFromSelection((EndpointObject)e.AddedItems[0]);
         }
     }
 }

@@ -70,7 +70,6 @@ namespace ServicePublisher
             newEndpoint.NumOperands = numOps;
             Console.WriteLine("Please enter the type of operands");
             newEndpoint.OperandType = Console.ReadLine();
-            //AddHeader("Authorization", "Basic " + token.ToString())
             RestRequest pubRequest = new RestRequest("registry/publish/", Method.Post).AddHeader("Authorization", " Basic " + token.ToString()).AddJsonBody(newEndpoint);
 
             RestResponse response = client.Execute(pubRequest);
